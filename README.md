@@ -56,21 +56,14 @@ ai-code-review-saas/
 │   ├── public/
 │   └── package.json
 │
+├── screenshots/
+│   ├── dashboard.png
+│   ├── login.png
+│   ├── review.png
+│   └── history.png
+│
 ├── main.py
 ├── requirements.txt
 ├── package.json
 ├── .gitignore
 └── README.md
-## 📸 Screenshots
-
-### Dashboard
-![Dashboard](screenshots/dashboard.png)
-
-### Login
-![Login](screenshots/login.png)
-
-### AI Code Review
-![AI Code Review](screenshots/review.png)
-
-### Review History
-![Review History](screenshots/history.png)

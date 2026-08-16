@@ -67,46 +67,16 @@ ai-code-review-saas/
 ├── package.json
 ├── .gitignore
 └── README.md
-
-### Ab bas 4 commands
-
-README save karne ke baad terminal me **sirf ye commands ek-ek karke**:
-
-Phir uske neeche:
-
-```markdown
 ## 📸 Screenshots
 
 ### 🖥️ Dashboard
-<img src="./screenshots/dashboard.png" alt="Dashboard" width="900">
+![Dashboard](screenshots/dashboard.png)
 
 ### 🔐 Login
-<img src="./screenshots/login.png" alt="Login" width="900">
+![Login](screenshots/login.png)
 
 ### 🤖 AI Code Review
-<img src="./screenshots/review.png" alt="AI Code Review" width="900">
+![AI Code Review](screenshots/review.png)
 
 ### 📜 Review History
-<img src="./screenshots/history.png" alt="Review History" width="900">
-
-## ✨ Project Highlights
-
-- AI-powered automated code analysis
-- Intelligent code quality scoring
-- Secure JWT-based authentication
-- User-specific review history
-- Multiple programming language support
-- Modern responsive SaaS interface
-- FastAPI REST backend
-- React-based frontend
-- MongoDB database integration
-
-## 👩‍💻 Author
-
-**Prakriti Jain**
-
-B.Tech AI Student | Python | Full Stack | AI/ML
-
----
-
-⭐ If you find this project useful, consider giving it a star!
+![Review History](screenshots/history.png)

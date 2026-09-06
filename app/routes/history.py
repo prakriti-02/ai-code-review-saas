@@ -1,7 +1,8 @@
 from bson import ObjectId
 from bson.errors import InvalidId
 
-from fastapi import APIRouter, Header, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from app.auth.jwt_handler import decode_access_token
 from app.database.collections import reviews_collection
@@ -9,36 +10,17 @@ from app.database.collections import reviews_collection
 
 router = APIRouter()
 
+security = HTTPBearer()
+
 
 # =========================================================
 # GET CURRENT USER
 # =========================================================
 
 def get_current_user(
-    authorization: str = Header(None)
+    credentials: HTTPAuthorizationCredentials = Depends(security)
 ):
-    if not authorization:
-        raise HTTPException(
-            status_code=401,
-            detail="Authorization token missing."
-        )
-
-    if not authorization.startswith("Bearer "):
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid authorization format."
-        )
-
-    token = authorization.split(
-        " ",
-        1
-    )[1].strip()
-
-    if not token:
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid authorization token."
-        )
+    token = credentials.credentials
 
     payload = decode_access_token(token)
 
@@ -63,11 +45,8 @@ def get_current_user(
 
 @router.get("/history")
 def get_history(
-    authorization: str = Header(None)
+    user=Depends(get_current_user)
 ):
-    user = get_current_user(
-        authorization
-    )
 
     reviews = reviews_collection.find(
         {
@@ -124,11 +103,8 @@ def get_history(
 @router.delete("/history/{review_id}")
 def delete_review(
     review_id: str,
-    authorization: str = Header(None)
+    user=Depends(get_current_user)
 ):
-    user = get_current_user(
-        authorization
-    )
 
     # -----------------------------------------------------
     # VALIDATE MONGODB OBJECT ID

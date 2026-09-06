@@ -91,10 +91,20 @@ def decode_access_token(token: str):
 
         return payload
 
-    except JWTError:
+    except JWTError as e:
+
+        print(
+            "JWT DECODE ERROR:",
+            repr(e)
+        )
 
         return None
 
-    except Exception:
+    except Exception as e:
+
+        print(
+            "JWT GENERAL ERROR:",
+            repr(e)
+        )
 
         return None

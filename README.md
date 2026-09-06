@@ -6,10 +6,18 @@ An AI-powered Code Review SaaS that analyzes source code and provides intelligen
 
 - 🤖 AI-powered code review using Google Gemini
 - 🔐 User authentication with JWT
+- 🔒 Secure password hashing
 - 👤 User-specific review history
+- 🔎 Search review history
+- 🎯 Filter reviews by programming language
+- 🔄 Refresh review history
 - 🗑️ Delete previous reviews
 - 📝 Support for multiple programming languages
-- 📊 Code quality score
+- 📊 AI-generated code quality score
+- 🐛 Bug detection
+- ⚡ Performance analysis
+- 🛡️ Security analysis
+- 💡 Code improvement suggestions
 - ⚡ FastAPI backend
 - ⚛️ React frontend
 - 🗄️ MongoDB database
@@ -19,6 +27,7 @@ An AI-powered Code Review SaaS that analyzes source code and provides intelligen
 ## 🛠️ Tech Stack
 
 ### Frontend
+
 - React
 - Vite
 - JavaScript
@@ -26,15 +35,19 @@ An AI-powered Code Review SaaS that analyzes source code and provides intelligen
 - Monaco Editor
 
 ### Backend
+
 - Python
 - FastAPI
 - Pydantic
 - JWT Authentication
+- Password Hashing
 
 ### AI
+
 - Google Gemini API
 
 ### Database
+
 - MongoDB
 - PyMongo
 

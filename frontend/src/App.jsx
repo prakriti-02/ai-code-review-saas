@@ -33,6 +33,9 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [language, setLanguage] = useState("python");
   const [history, setHistory] = useState([]);
+  const [historySearch, setHistorySearch] = useState("");
+const [historyLanguage, setHistoryLanguage] = useState("all");
+const [historyLoading, setHistoryLoading] = useState(false);
   const [rating, setRating] = useState("");
 
   const [errorMessage, setErrorMessage] = useState("");
@@ -109,45 +112,51 @@ function App() {
   // =========================================================
   // LOAD HISTORY
   // =========================================================
+const loadHistory = async () => {
+  if (!token) return;
 
-  const loadHistory = async () => {
-    if (!token) return;
+  setHistoryLoading(true);
 
-    try {
-      const response = await fetch(
-        `${API_URL}/history`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (response.status === 401) {
-        handleUnauthorized();
-        return;
+  try {
+    const response = await fetch(
+      `${API_URL}/history`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }
+    );
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        console.error("History error:", data);
-        return;
-      }
-
-      setHistory(
-        Array.isArray(data.history)
-          ? data.history
-          : []
-      );
-    } catch (error) {
-      console.error(
-        "Unable to load history:",
-        error
-      );
+    if (response.status === 401) {
+      handleUnauthorized();
+      return;
     }
-  };
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error("History error:", data);
+      return;
+    }
+
+    setHistory(
+      Array.isArray(data.history)
+        ? data.history
+        : []
+    );
+
+  } catch (error) {
+    console.error(
+      "Unable to load history:",
+      error
+    );
+
+  } finally {
+    setHistoryLoading(false);
+  }
+};
+  
 
   // =========================================================
   // DELETE REVIEW
@@ -1315,142 +1324,232 @@ function App() {
 
             {/* HISTORY */}
 
-            <div
-              id="review-history"
-              className="mt-8"
-            >
+ <div
+  id="review-history"
+  className="mt-8"
+>
+  <div className="flex items-center justify-between mb-4">
 
-              <div className="flex items-center justify-between mb-4">
+    <div>
+      <h2 className="text-2xl font-bold">
+        Review History
+      </h2>
+
+      <p className="text-sm text-gray-500 mt-1">
+        Your recent AI code analyses
+      </p>
+    </div>
+
+    <span className="text-xs text-gray-500 bg-white/5 border border-white/10 px-3 py-2 rounded-lg">
+      {history.length}{" "}
+      {history.length === 1
+        ? "review"
+        : "reviews"}
+    </span>
+
+  </div>
+
+
+  {/* SEARCH + FILTER */}
+  <div className="flex flex-col sm:flex-row gap-3 mb-5">
+
+    <input
+      type="text"
+      value={historySearch}
+      onChange={(e) =>
+        setHistorySearch(e.target.value)
+      }
+      placeholder="🔎 Search reviews..."
+      className="flex-1 bg-[#0d1421] border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 outline-none focus:border-blue-500"
+    />
+
+    <select
+      value={historyLanguage}
+      onChange={(e) =>
+        setHistoryLanguage(e.target.value)
+      }
+      className="bg-[#0d1421] border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 outline-none focus:border-blue-500"
+    >
+      <option value="all">
+        All Languages
+      </option>
+
+      <option value="python">
+        Python
+      </option>
+
+      <option value="javascript">
+        JavaScript
+      </option>
+
+      <option value="java">
+        Java
+      </option>
+
+      <option value="cpp">
+        C++
+      </option>
+
+      <option value="c">
+        C
+      </option>
+    </select>
+
+
+    <button
+      onClick={loadHistory}
+      className="px-5 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-sm transition"
+    >
+      🔄 Refresh
+    </button>
+
+  </div>
+
+
+  {/* HISTORY LIST */}
+
+  {history.length === 0 ? (
+
+    <div className="bg-[#0d1421] border border-white/10 rounded-2xl p-10 text-center">
+
+      <div className="text-4xl mb-4">
+        📝
+      </div>
+
+      <h3 className="font-semibold text-gray-300">
+        No reviews yet
+      </h3>
+
+      <p className="text-sm text-gray-600 mt-2">
+        Your analyzed code will appear here.
+      </p>
+
+    </div>
+
+  ) : (
+
+    <div className="space-y-3">
+
+      {history
+        .filter((item) => {
+
+          const search =
+            historySearch
+              .trim()
+              .toLowerCase();
+
+          const matchesSearch =
+            !search ||
+            item.code
+              ?.toLowerCase()
+              .includes(search) ||
+            item.review
+              ?.toLowerCase()
+              .includes(search) ||
+            item.language
+              ?.toLowerCase()
+              .includes(search);
+
+          const matchesLanguage =
+            historyLanguage === "all" ||
+            item.language
+              ?.toLowerCase() ===
+              historyLanguage;
+
+          return (
+            matchesSearch &&
+            matchesLanguage
+          );
+        })
+        .map((item) => (
+
+          <div
+            key={item.id}
+            className="bg-[#0d1421] border border-white/10 rounded-2xl p-5 hover:border-blue-500/30 transition"
+          >
+
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+
+              <div className="flex items-center gap-4">
+
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center">
+                  💻
+                </div>
 
                 <div>
 
-                  <h2 className="text-2xl font-bold">
-                    Review History
-                  </h2>
+                  <div className="flex items-center gap-3 flex-wrap">
 
-                  <p className="text-sm text-gray-500 mt-1">
-                    Your recent AI code analyses
+                    <p className="font-semibold">
+                      {(
+                        item.language ||
+                        "unknown"
+                      ).toUpperCase()}
+                    </p>
+
+                    {item.score !== null &&
+                      item.score !== "" &&
+                      item.score !== undefined && (
+
+                        <span className="text-xs bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 px-2 py-1 rounded-md">
+
+                          ⭐ {item.score}/10
+
+                        </span>
+
+                      )}
+
+                  </div>
+
+                  <p className="text-xs text-gray-500 mt-1">
+
+                    {item.created_at
+                      ? new Date(
+                          item.created_at
+                        ).toLocaleString()
+                      : "Unknown date"}
+
                   </p>
 
                 </div>
-
-                <span className="text-xs text-gray-500 bg-white/5 border border-white/10 px-3 py-2 rounded-lg">
-                  {history.length}{" "}
-                  {history.length === 1
-                    ? "review"
-                    : "reviews"}
-                </span>
 
               </div>
 
-              {history.length === 0 ? (
 
-                <div className="bg-[#0d1421] border border-white/10 rounded-2xl p-10 text-center">
+              <div className="flex gap-2 flex-wrap">
 
-                  <div className="text-4xl mb-4">
-                    📝
-                  </div>
+                <button
+                  onClick={() =>
+                    openHistoryReview(item)
+                  }
+                  className="px-4 py-2 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20 hover:bg-blue-500/20 transition text-sm"
+                >
+                  Open Review
+                </button>
 
-                  <h3 className="font-semibold text-gray-300">
-                    No reviews yet
-                  </h3>
 
-                  <p className="text-sm text-gray-600 mt-2">
-                    Your analyzed code will appear here.
-                  </p>
+                <button
+                  onClick={() =>
+                    deleteReview(item.id)
+                  }
+                  className="px-4 py-2 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition text-sm"
+                >
+                  Delete
+                </button>
 
-                </div>
-
-              ) : (
-
-                <div className="space-y-3">
-
-                  {history.map((item) => (
-
-                    <div
-                      key={item.id}
-                      className="bg-[#0d1421] border border-white/10 rounded-2xl p-5 hover:border-blue-500/30 transition"
-                    >
-
-                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-
-                        <div className="flex items-center gap-4">
-
-                          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center">
-                            💻
-                          </div>
-
-                          <div>
-
-                            <div className="flex items-center gap-3 flex-wrap">
-
-                              <p className="font-semibold">
-                                {(
-                                  item.language ||
-                                  "unknown"
-                                ).toUpperCase()}
-                              </p>
-
-                              {item.score !==
-                                null &&
-                                item.score !==
-                                  "" &&
-                                item.score !==
-                                  undefined && (
-                                  <span className="text-xs bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 px-2 py-1 rounded-md">
-                                    ⭐{" "}
-                                    {item.score}
-                                    /10
-                                  </span>
-                                )}
-
-                            </div>
-
-                            <p className="text-xs text-gray-500 mt-1">
-                              {item.created_at
-                                ? new Date(
-                                    item.created_at
-                                  ).toLocaleString()
-                                : "Unknown date"}
-                            </p>
-
-                          </div>
-
-                        </div>
-
-                        <div className="flex gap-2 flex-wrap">
-
-                          <button
-                            onClick={() =>
-                              openHistoryReview(item)
-                            }
-                            className="px-4 py-2 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20 hover:bg-blue-500/20 transition text-sm"
-                          >
-                            Open Review
-                          </button>
-
-                          <button
-                            onClick={() =>
-                              deleteReview(item.id)
-                            }
-                            className="px-4 py-2 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition text-sm"
-                          >
-                            Delete
-                          </button>
-
-                        </div>
-
-                      </div>
-
-                    </div>
-
-                  ))}
-
-                </div>
-
-              )}
+              </div>
 
             </div>
+
+          </div>
+
+        ))}
+
+    </div>
+
+  )}
+
+</div>         
 
             {/* FOOTER */}
 

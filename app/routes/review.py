@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Header, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from app.auth.jwt_handler import decode_access_token
 from app.models.review import ReviewRequest
@@ -7,40 +8,19 @@ from app.services.review_service import review_code_service
 
 router = APIRouter()
 
+security = HTTPBearer()
+
 
 # =========================================================
 # GET CURRENT USER
 # =========================================================
 
 def get_current_user(
-    authorization: str = Header(None)
+    credentials: HTTPAuthorizationCredentials = Depends(security)
 ):
-    if not authorization:
-        raise HTTPException(
-            status_code=401,
-            detail="Authorization token missing."
-        )
+    token = credentials.credentials
 
-    if not authorization.startswith("Bearer "):
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid authorization format."
-        )
-
-    token = authorization.split(
-        " ",
-        1
-    )[1].strip()
-
-    if not token:
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid authorization token."
-        )
-
-    payload = decode_access_token(
-        token
-    )
+    payload = decode_access_token(token)
 
     if not payload:
         raise HTTPException(
@@ -64,11 +44,8 @@ def get_current_user(
 @router.post("/review")
 def review_code(
     request: ReviewRequest,
-    authorization: str = Header(None)
+    user=Depends(get_current_user)
 ):
-    user = get_current_user(
-        authorization
-    )
 
     result = review_code_service(
         request.code,

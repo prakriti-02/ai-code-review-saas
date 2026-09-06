@@ -37,8 +37,11 @@ if not MONGODB_URL:
 
 client = MongoClient(
     MONGODB_URL,
-    serverSelectionTimeoutMS=5000
+    serverSelectionTimeoutMS=10000,
+    connectTimeoutMS=10000,
+    tls=True
 )
+
 
 
 # =========================================================

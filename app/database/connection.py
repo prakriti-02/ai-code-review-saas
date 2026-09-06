@@ -5,10 +5,7 @@ from dotenv import load_dotenv
 from pymongo import MongoClient
 
 
-# =========================================================
-# LOAD ENVIRONMENT VARIABLES
-# =========================================================
-
+# Load .env
 ENV_FILE = (
     Path(__file__)
     .resolve()
@@ -19,50 +16,31 @@ ENV_FILE = (
 load_dotenv(ENV_FILE)
 
 
-# =========================================================
-# MONGODB CONFIGURATION
-# =========================================================
-
+# MongoDB URL
 MONGODB_URL = os.getenv("MONGODB_URL")
 
 if not MONGODB_URL:
-    raise RuntimeError(
-        "MONGODB_URL is missing from .env file."
-    )
+    raise RuntimeError("MONGODB_URL is missing.")
 
 
-# =========================================================
-# MONGODB CLIENT
-# =========================================================
-
+# MongoDB client
 client = MongoClient(
     MONGODB_URL,
     serverSelectionTimeoutMS=10000,
     connectTimeoutMS=10000,
-    tls=True
 )
 
 
-
-# =========================================================
-# DATABASE CONNECTION CHECK
-# =========================================================
-
+# Test connection
 try:
-
     client.admin.command("ping")
-
     print("MongoDB connection successful.")
 
 except Exception as e:
-
     raise RuntimeError(
         f"MongoDB connection failed: {e}"
     )
 
 
-# =========================================================
-# DATABASE
-# =========================================================
-
+# Database
 db = client["code_review_saas"]
